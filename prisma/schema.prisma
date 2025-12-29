@@ -1,0 +1,13 @@
+﻿generator client {
+  provider        = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+model Post {
+  id        Int     @id @default(autoincrement())
+  title     String
+  published Boolean @default(true)
+}
