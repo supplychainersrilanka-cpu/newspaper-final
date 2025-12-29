@@ -1,12 +1,12 @@
-﻿import prisma from '@/lib/prisma';
+import prisma from '@/lib/prisma';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
 
 export async function POST(req: Request) {
-  const { title, content } = await req.json();
+  const body = await req.json() as { title: string; content: string };
+  const { title, content } = body;
   
-  // Note: We are using Author ID 1 for now (we will create this author next)
   const post = await prisma.post.create({
     data: {
       title,
