@@ -1,4 +1,4 @@
-﻿'use client';
+'use client';
 import { useState, FormEvent } from 'react';
 
 export default function AdminPage() {
@@ -15,16 +15,16 @@ export default function AdminPage() {
     });
     
     if (res.ok) {
-      setStatus('✅ Article Published!');
+      setStatus('? Article Published!');
       target.reset();
     } else {
-      setStatus('❌ Error publishing article.');
+      setStatus('? Error publishing article.');
     }
   }
 
   return (
     <div className="p-10 max-w-2xl mx-auto font-sans">
-      <h1 className="text-3xl font-bold mb-6">Admin: Create New Article</h1>
+      <h1 className="text-3xl font-bold mb-6 text-black">Admin: Create New Article</h1>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input name="title" placeholder="Article Title" className="w-full p-3 border rounded text-black" required />
         <textarea name="content" placeholder="Write your story..." className="w-full p-3 border rounded h-40 text-black" required />
@@ -32,7 +32,7 @@ export default function AdminPage() {
           Publish to Gazette
         </button>
       </form>
-      {status && <p className={mt-4 font-bold }>{status}</p>}
+      {status && <p className={`mt-4 font-bold ${status.includes('?') ? 'text-green-600' : 'text-red-600'}`}>{status}</p>}
     </div>
   );
 }
