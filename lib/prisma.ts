@@ -2,21 +2,19 @@ import { PrismaClient } from '@prisma/client'
 import { PrismaD1 } from '@prisma/adapter-d1'
 import { getRequestContext } from '@cloudflare/next-on-pages'
 
-interface CloudflareEnv {
-  DB: D1Database;
-}
-
 export const getPrisma = () => {
   try {
-    const env = getRequestContext().env as CloudflareEnv;
-    if (!env || !env.DB) {
-      throw new Error("D1 Database binding 'DB' not found.");
+    const runtime = getRequestContext() as any;
+    const d1 = runtime?.env?.DB;
+    
+    if (!d1) {
+      console.warn("D1 Binding 'DB' not found. Site is running in offline mode.");
+      return null;
     }
-    const adapter = new PrismaD1(env.DB);
+    
+    const adapter = new PrismaD1(d1);
     return new PrismaClient({ adapter });
-  } catch (e) {
-    console.error("Prisma Initialization Error:", e);
-    // Return a dummy client to prevent total crash on first load
-    return new PrismaClient();
+  } catch {
+    return null;
   }
 }
