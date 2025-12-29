@@ -4,17 +4,19 @@ import { getRequestContext } from '@cloudflare/next-on-pages'
 
 export const getPrisma = () => {
   try {
-    const runtime = getRequestContext() as any;
-    const d1 = runtime?.env?.DB;
+    // Check if we are actually in the Cloudflare environment
+    const context = getRequestContext() as any;
+    const d1 = context?.env?.DB;
     
     if (!d1) {
-      console.warn("D1 Binding 'DB' not found. Site is running in offline mode.");
+      console.warn("D1 Binding 'DB' not detected.");
       return null;
     }
     
     const adapter = new PrismaD1(d1);
     return new PrismaClient({ adapter });
-  } catch {
+  } catch (err) {
+    console.error("Prisma failed to initialize:", err);
     return null;
   }
 }
