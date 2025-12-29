@@ -1,8 +1,4 @@
-﻿import { Inter, Playfair_Display } from "next/font/google";
 import "./globals.css";
-
-const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
-const playfair = Playfair_Display({ subsets: ["latin"], variable: "--font-playfair" });
 
 export const metadata = {
   title: "Digital Citizen Gazette",
@@ -12,7 +8,7 @@ export const metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en">
-      <body className={inter.variable + " " + playfair.variable + " font-sans antialiased bg-[#fdfdfb] text-zinc-900"}>
+      <body className="antialiased bg-white text-black font-serif">
         {children}
       </body>
     </html>
