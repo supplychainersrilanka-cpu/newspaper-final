@@ -1,0 +1,53 @@
+---
+// Server-side code (running on Cloudflare)
+const db = Astro.locals.runtime?.env?.DB;
+let posts = [];
+
+try {
+  if (db) {
+    // We try to fetch the posts you created earlier
+    const { results } = await db.prepare("SELECT * FROM Post ORDER BY id DESC LIMIT 10").all();
+    posts = results;
+  }
+} catch (e) {
+  console.log("Database connection pending...");
+}
+---
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <title>The Gazette | Astro Edition</title>
+        <meta name="viewport" content="width=device-width" />
+    </head>
+    <body class="bg-[#fdfdfb] text-zinc-900 font-serif p-8">
+        <header class="border-b-4 border-black pb-6 mb-12 text-center">
+            <h1 class="text-6xl font-black uppercase tracking-tighter mb-2">The Gazette</h1>
+            <p class="text-xs font-bold uppercase tracking-widest text-zinc-500">Vol. 1 • Digital Edition</p>
+        </header>
+
+        <main class="max-w-3xl mx-auto">
+            {posts.length === 0 ? (
+                <div class="border-2 border-dashed border-zinc-300 p-12 text-center rounded-lg">
+                    <p class="text-2xl italic text-zinc-400 font-serif mb-2">"The wire is silent..."</p>
+                    <p class="text-xs uppercase tracking-widest text-zinc-500">
+            Status: App is running. Connect 'newspaper-db' in Cloudflare Settings to see content.
+          </p>
+                </div>
+            ) : (
+                <div class="space-y-12">
+                    {posts.map((post) => (
+                        <article class="border-b border-zinc-100 pb-12 last:border-0">
+                            <h2 class="text-4xl font-bold leading-tight mb-4 hover:text-red-800 transition-colors">
+                {post.title}
+              </h2>
+                            <p class="text-lg text-zinc-600 leading-relaxed">
+                {post.content}
+              </p>
+                        </article>
+                    ))}
+                </div>
+            )}
+        </main>
+    </body>
+</html>
