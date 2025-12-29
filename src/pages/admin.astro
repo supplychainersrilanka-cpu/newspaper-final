@@ -1,0 +1,106 @@
+---
+// Server Side Logic: This runs on Cloudflare Edge
+const db = Astro.locals.runtime?.env?.DB;
+let message = "";
+let status = "";
+
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    const title = data.get("title") as string;
+    const content = data.get("content") as string;
+    const password = data.get("password") as string;
+
+    // SIMPLE SECURITY: Change "secret123" to whatever you want!
+    if (password !== "secret123") {
+      message = "? ACCESS DENIED: Invalid Press Pass";
+      status = "error";
+    } else if (db) {
+      await db.prepare(
+        "INSERT INTO Post (title, content, published, authorId) VALUES (?, ?, 1, 1)"
+      ).bind(title, content).run();
+      
+      message = "? EXTRA! EXTRA! Story published to the wire.";
+      status = "success";
+    } else {
+      message = "?? Database connection missing.";
+      status = "error";
+    }
+  } catch (error) {
+    message = "? System Error: " + error.message;
+    status = "error";
+  }
+}
+---
+
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <title>Editor's Desk | The Gazette</title>
+  <meta name="viewport" content="width=device-width" />
+</head>
+<body class="bg-zinc-100 text-zinc-900 font-serif h-screen flex items-center justify-center p-4">
+
+  <div class="bg-white max-w-2xl w-full p-8 shadow-xl border-t-8 border-black">
+    <header class="flex justify-between items-end mb-8 border-b border-zinc-200 pb-4">
+      <div>
+        <h1 class="text-4xl font-black uppercase tracking-tighter">Editor's Desk</h1>
+        <p class="text-xs font-bold uppercase tracking-widest text-zinc-500 mt-1">Authorized Personnel Only</p>
+      </div>
+      <a href="/" class="text-sm font-sans font-bold underline hover:text-red-700">? Back to Front Page</a>
+    </header>
+
+    {message && (
+      <div class={`p-4 mb-6 text-center font-bold text-white ${status === "error" ? "bg-red-600" : "bg-green-700"}`}>
+        {message}
+      </div>
+    )}
+
+    <form method="POST" class="space-y-6">
+      
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-widest mb-2">Headline</label>
+        <input 
+          type="text" 
+          name="title" 
+          placeholder="e.g. MARKET HITS RECORD HIGH" 
+          required 
+          class="w-full p-4 text-2xl font-bold border-2 border-zinc-200 focus:border-black outline-none bg-zinc-50"
+        />
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-widest mb-2">The Story</label>
+        <textarea 
+          name="content" 
+          rows="8" 
+          placeholder="Dateline: Colombo... (Write your story here)" 
+          required 
+          class="w-full p-4 text-lg border-2 border-zinc-200 focus:border-black outline-none bg-zinc-50 font-serif leading-relaxed"
+        ></textarea>
+      </div>
+
+      <div class="bg-zinc-100 p-4 flex items-center justify-between border border-zinc-200">
+        <div class="flex-1 mr-4">
+          <label class="block text-xs font-bold uppercase tracking-widest mb-1 text-zinc-500">Press Pass Code</label>
+          <input 
+            type="password" 
+            name="password" 
+            placeholder="Enter Code" 
+            required 
+            class="w-full p-2 bg-white border border-zinc-300"
+          />
+        </div>
+        <button 
+          type="submit" 
+          class="bg-black text-white px-8 py-4 font-bold uppercase tracking-widest hover:bg-red-700 transition-colors"
+        >
+          Publish to Wire
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+</body>
+</html>
