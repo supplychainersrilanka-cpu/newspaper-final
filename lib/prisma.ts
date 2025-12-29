@@ -7,7 +7,16 @@ interface CloudflareEnv {
 }
 
 export const getPrisma = () => {
-  const env = getRequestContext().env as CloudflareEnv;
-  const adapter = new PrismaD1(env.DB);
-  return new PrismaClient({ adapter });
+  try {
+    const env = getRequestContext().env as CloudflareEnv;
+    if (!env || !env.DB) {
+      throw new Error("D1 Database binding 'DB' not found.");
+    }
+    const adapter = new PrismaD1(env.DB);
+    return new PrismaClient({ adapter });
+  } catch (e) {
+    console.error("Prisma Initialization Error:", e);
+    // Return a dummy client to prevent total crash on first load
+    return new PrismaClient();
+  }
 }
