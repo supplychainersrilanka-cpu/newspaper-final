@@ -7,7 +7,7 @@ interface CloudflareEnv {
 }
 
 export const getPrisma = () => {
-  const runtime = getRequestContext().env as CloudflareEnv;
-  const adapter = new PrismaD1(runtime.DB);
+  const env = getRequestContext().env as CloudflareEnv;
+  const adapter = new PrismaD1(env.DB);
   return new PrismaClient({ adapter });
 }

@@ -5,16 +5,10 @@ export const runtime = 'edge';
 
 export async function POST(req: Request) {
   const prisma = getPrisma();
-  const body = await req.json() as { title: string; content: string };
-  const { title, content } = body;
+  const { title, content } = await req.json() as { title: string, content: string };
   
   const post = await prisma.post.create({
-    data: {
-      title,
-      content,
-      published: true,
-      authorId: 1, 
-    },
+    data: { title, content, published: true, authorId: 1 }
   });
 
   return NextResponse.json(post);
